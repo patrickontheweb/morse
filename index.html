@@ -6,75 +6,85 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 		<script src="js/morse.js"></script>
+		<script src="js/emitter.js"></script>
 		
 		<!-- CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 	</head>
 	<body>		
-		<div class="container">
-			<h1 class="text-primary text-center mt-4">Morse CW Trainer</h1>
-			<div class="row">
-				<div class="col-sm-11">
-					<div class="form-group">
-					  <label for="input">Enter plain text:</label>
-					  <textarea class="form-control" rows="2" id="plain-input"></textarea>
+		<div class="container-fluid">
+		
+			<!-- page header -->
+			<h1 class="text-primary text-center m-5">Morse CW Trainer</h1>
+			
+			<!-- main body -->
+			<div class="d-flex justify-content-center">
+			
+				<!-- left column -->
+				<div class="card">
+					<div class="card-body">
+						Stuff
 					</div>
 				</div>
-				<div class="col-sm-1">
-					<div class="form-group">
-					  <label for="wpm">WPM:</label>
-					  <select class="form-control" id="wpm">
-					    <option>5</option>
-					    <option>10</option>
-					    <option>15</option>
-					    <option>20</option>
-					    <option>25</option>
-					    <option>30</option>
-					  </select>
+				
+				<!-- middle column -->
+				<div>
+					<div class="text-center">
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">0</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">1</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">2</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">3</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">4</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">5</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">6</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">7</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">8</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">9</button>
+					</div>
+					<div class="text-center mt-1">
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">Q</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">W</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">E</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">R</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">T</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">Y</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">U</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">I</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">O</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">P</button>
+					</div>
+					<div class="text-center mt-1">
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">A</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">S</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">D</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">F</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">G</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">H</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">J</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">K</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">L</button>
+					</div>
+					<div class="text-center mt-1">
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">Z</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">X</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">C</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">V</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">B</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">N</button>
+						<button type="button" class="key-btn btn-lg btn btn-info m-1">M</button>
+					</div>
+					<div class="text-center mt-5">
+						<button type="button" class="btn btn-outline-primary" id="setup-button">Setup</button>
+						<button type="button" class="btn btn-primary" id="random-button">Random</button>
 					</div>
 				</div>
-				<div class="col-sm-11">
-					<button type="button" class="btn btn-primary float-right" id="play-button">Play</button>
-					<button type="button" class="btn btn-outline-primary float-right mr-2" id="clear-button">Clear</button>
-					<h2 id="morse-input" class="text-danger media-heading"></h2>
-				</div>
-				<div class="col-sm-1"></div>
-			</div>
-			<div class="text-center mt-5">
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">Q</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">W</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">E</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">R</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">T</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">Y</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">U</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">I</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">O</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">P</button>
-			</div>
-			<div class="text-center mt-1">
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">A</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">S</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">D</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">F</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">G</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">H</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">J</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">K</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">L</button>
-			</div>
-			<div class="text-center mt-1">
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">Z</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">X</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">C</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">V</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">B</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">N</button>
-				<button type="button" class="key-btn btn-lg btn btn-outline-info m-1">M</button>
-			</div>
-			<div class="text-center mt-5">
-				<button type="button" class="btn btn-outline-primary" id="setup-button">Setup</button>
-				<button type="button" class="btn btn-primary" id="random-button">Random</button>
+				
+				<!-- right column -->
+				<div class="card">
+					<div class="card-body">
+						Right
+					</div>
+				</div>			
 			</div>
 			<div class="alert mt-5" style="opacity: 0;">
 			  <button type="button" class="close">&times;</button>

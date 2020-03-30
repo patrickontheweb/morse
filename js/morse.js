@@ -1,43 +1,15 @@
-var ctx = new (window.AudioContext || window.webkitAudioContext)();
-var wordSeparator = '|';
-var letterSeparator = ' ';
-var undefinedChar = '?';
-
 morse = {		
 		validCharacters : /^[0-9a-zA-Z]+$/,
+		wordSeparator : '|',
+		letterSeparator : ' ',
+		undefinedChar : '?',
+		frequency : 600,
 		wpm : 20,
+		enabledCharacters : ['p', 'c', 'm', '1', '8'],
 		setupMode : false,
 		correctAnswer : null,
 		playKeys : false,
-		alphabet : new Map([
-			['a', '.-'],
-			['b', '-...'],
-			['c', '-.-.'],
-			['d', '-..'],
-			['e', '.'],
-			['f', '..-.'],
-			['g', '--.'],
-			['h', '....'],
-			['i', '..'],
-			['j', '.---'],
-			['k', '-.-'],
-			['l', '.-..'],
-			['m', '--'],
-			['n', '-.'],
-			['o', '---'],
-			['p', '.--.'],
-			['q', '--.-'],
-			['r', '.-.'],
-			['s', '...'],
-			['t', '-'],
-			['u', '..-'],
-			['v', '...-'],
-			['w', '.--'],
-			['x', '-..-'],
-			['y', '-.--'],
-			['z', '--..'],
-			[' ', wordSeparator]
-		]),
+		alphabet : null,
 		
 		initialize : function() {
 			morse.initializeState();
@@ -46,7 +18,54 @@ morse = {
 		}, 
 		
 		initializeState : function() {
+			morse.alphabet = new Map([
+				['0', '-----'],
+				['1', '.----'],
+				['2', '..---'],
+				['3', '...--'],
+				['4', '....-'],
+				['5', '.....'],
+				['6', '-....'],
+				['7', '--...'],
+				['8', '---..'],
+				['9', '----.'],
+				['a', '.-'],
+				['b', '-...'],
+				['c', '-.-.'],
+				['d', '-..'],
+				['e', '.'],
+				['f', '..-.'],
+				['g', '--.'],
+				['h', '....'],
+				['i', '..'],
+				['j', '.---'],
+				['k', '-.-'],
+				['l', '.-..'],
+				['m', '--'],
+				['n', '-.'],
+				['o', '---'],
+				['p', '.--.'],
+				['q', '--.-'],
+				['r', '.-.'],
+				['s', '...'],
+				['t', '-'],
+				['u', '..-'],
+				['v', '...-'],
+				['w', '.--'],
+				['x', '-..-'],
+				['y', '-.--'],
+				['z', '--..'],
+				[' ', morse.wordSeparator]
+			]);
 			
+			$('.key-btn').each(function(){
+				var value = $(this).html().toLowerCase();
+				if(morse.enabledCharacters.includes(value)) {
+					$(this).removeClass('btn-outline-info').addClass('btn-info').prop('disabled', false);					
+				} else {
+					$(this).removeClass('btn-info').addClass('btn-outline-info').prop('disabled', true);
+				}
+			});
 		},
 		
 		updateUrlParameters : function() {
@@ -120,7 +139,7 @@ morse = {
 		
 		keyButtonClicked : function(button) {
 			if(morse.setupMode) {
-				$(button).toggleClass('btn-outline-info btn-light');
+				$(button).toggleClass('btn-info btn-outline-info');
 			} else {
 				var value = $(button).html();
 				var morseCode = morse.plainToMorseCode(value);
@@ -147,7 +166,17 @@ morse = {
 				morse.enableKeyButtons();
 			} else {
 				morse.disableKeyButtons();
+				morse.updateEnabledCharacters();
 			}
+		},
+		
+		updateEnabledCharacters : function() {
+			morse.enabledCharacters.splice(0, morse.enabledCharacters.length);
+			$('.key-btn').not(':disabled').each(function(){
+				var value = $(this).html().toLowerCase();
+				morse.enabledCharacters.push(value);
+			});
+			console.log(morse.enabledCharacters);
 		},
 		
 		randomButtonClicked : function(button) {
@@ -168,7 +197,7 @@ morse = {
 		},
 		
 		disableKeyButtons : function() {
-			$('.key-btn.btn-light').prop('disabled', true);
+			$('.key-btn.btn-outline-info').prop('disabled', true);
 		},
 		
 		enableRandomButton : function() {
@@ -182,8 +211,8 @@ morse = {
 		},
 		
 		getRandomCharacter : function() {
-			var index = Math.floor(Math.random() * 26);
-			return Array.from(morse.alphabet.keys())[index];
+			var index = Math.floor(Math.random() * morse.enabledCharacters.length);
+			return morse.enabledCharacters[index];
 		},
 		
 		playInput : function() {
@@ -209,54 +238,30 @@ morse = {
 				}
 				morseCode += morseChar;
 				if(plainChar.match(morse.validCharacters)) {
-					morseCode += letterSeparator;
+					morseCode += morse.letterSeparator;
 				}
 			} 
-			morseCode = morseCode.replace(letterSeparator + wordSeparator, wordSeparator);
+			morseCode = morseCode.replace(morse.letterSeparator + morse.wordSeparator, morse.wordSeparator);
 			return morseCode;
 		},
 		
 		play : function(input) {
-			var t = ctx.currentTime;
-			var oscillator = ctx.createOscillator();   
-			oscillator.type = 'sine';
-		    oscillator.frequency.value = 600;    
-		    
-		    var gainNode = ctx.createGain();
-		    gainNode.gain.setValueAtTime(0, t);
-		    
-		    var dot = 1.2 / morse.wpm;
-		    
-		    input.split('').forEach(function(letter) {
-		        switch(letter) {
-		            case '.':
-		                gainNode.gain.setValueAtTime(1, t);
-		                t += dot;
-		                gainNode.gain.setValueAtTime(0, t);
-		                t += dot;
-		                break;
-		            case '-':
-		                gainNode.gain.setValueAtTime(1, t);
-		                t += 3 * dot;
-		                gainNode.gain.setValueAtTime(0, t);
-		                t += dot;
-		                break;
-		            case letterSeparator:
-		                t += 3 * dot;
-		                break;
-		            case wordSeparator:
-		                t += 7 * dot;
-		                break;
-		        }
-		    });
-
-		    oscillator.connect(gainNode);
-		    gainNode.connect(ctx.destination);
-		    t = ctx.currentTime;
-
-		    oscillator.start();
-
-		    return false;
+			emitter.emit(morse.buildEmitterOptions(input));
+		},
+		
+		buildEmitterOptions : function(input) {
+			var options = {
+				input : input,
+				letterSeparator : morse.letterSeparator,
+				wordSeparator : morse.wordSeparator,
+				wpm : morse.wpm,
+				frequency : morse.frequency,
+				type : 'sine'			
+			};
+			
+			console.log(options);
+			
+			return options;
 		},
 		
 		// shouldn't need this buy $('#optId option[value="x"]').length 
