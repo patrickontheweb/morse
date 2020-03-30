@@ -58,6 +58,10 @@ morse = {
 				[' ', morse.wordSeparator]
 			]);
 			
+			morse.updateKeysForEnabledCharacters();
+		},
+		
+		updateKeysForEnabledCharacters : function() {			
 			$('.key-btn').each(function(){
 				var value = $(this).html().toLowerCase();
 				if(morse.enabledCharacters.includes(value)) {
@@ -76,17 +80,10 @@ morse = {
 		
 		addListeners : function() {
 			morse.addButtonListeners();
-			morse.addKeyListeners();
 			morse.addBlurListeners();
 		},
 		
 		addButtonListeners : function() {
-			$(document).on('click', '#play-button', function() {
-				morse.playInput();
-			});
-			$(document).on('click', '#clear-button', function() {
-				morse.clearInput();
-			});
 			$(document).on('click', '.key-btn', function() {
 				morse.keyButtonClicked($(this));
 			});
@@ -100,26 +97,6 @@ morse = {
 				morse.hideAlert(100);
 			});
 		
-		},
-		
-		addKeyListeners : function() {
-			$(document).on('keypress', function(event) {
-				if(morse.playKeys) {
-					morse.play(morse.alphabet.get(String.fromCharCode(event.which)));
-				}
-			});
-			$(document).on('keyup', '#plain-input', function() {
-				var plain = $(this).val();
-				$('#morse-input').html(morse.plainToMorseCode(plain));
-			});
-			$(document).on('keypress', '#plain-input', function(event) {
-				if(event.which == 13) {
-					console.log('Enter');
-					event.stopPropagation();
-					morse.playInput();
-					return false;
-				}
-			});
 		},
 		
 		addBlurListeners : function() {
@@ -221,10 +198,6 @@ morse = {
 			morse.play(morseCode);
 		},
 		
-		clearInput : function() {
-			$('#plain-input').val('').keyup();
-		},
-		
 		plainToMorseCode : function(plain) {
 			var morseCode = '';
 			
@@ -250,7 +223,7 @@ morse = {
 		},
 		
 		buildEmitterOptions : function(input) {
-			var options = {
+			return {
 				input : input,
 				letterSeparator : morse.letterSeparator,
 				wordSeparator : morse.wordSeparator,
@@ -258,10 +231,6 @@ morse = {
 				frequency : morse.frequency,
 				type : 'sine'			
 			};
-			
-			console.log(options);
-			
-			return options;
 		},
 		
 		// shouldn't need this buy $('#optId option[value="x"]').length 
