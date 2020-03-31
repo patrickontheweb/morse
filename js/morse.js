@@ -6,7 +6,7 @@ morse = {
 		frequency : 600,
 		wpm : 20,
 		enabledCharacters : ['p', 'c', 'm', '1', '8'],
-		setupMode : false,
+		pickMode : false,
 		correctAnswer : null,
 		playKeys : false,
 		alphabet : null,
@@ -57,17 +57,15 @@ morse = {
 				['z', '--..'],
 				[' ', morse.wordSeparator]
 			]);
-			
-			morse.updateKeysForEnabledCharacters();
 		},
 		
-		updateKeysForEnabledCharacters : function() {			
+		updateKeysForEnabledCharacters : function() {	
 			$('.key-btn').each(function(){
 				var value = $(this).html().toLowerCase();
 				if(morse.enabledCharacters.includes(value)) {
-					$(this).removeClass('btn-outline-info').addClass('btn-info').prop('disabled', false);					
+					$(this).removeClass('btn-outline-primary').addClass('btn-primary').prop('disabled', false);					
 				} else {
-					$(this).removeClass('btn-info').addClass('btn-outline-info').prop('disabled', true);
+					$(this).removeClass('btn-primary').addClass('btn-outline-primary').prop('disabled', true);
 				}
 			});
 		},
@@ -75,7 +73,9 @@ morse = {
 		updateUrlParameters : function() {
 			var queryString = window.location.search;
 			var urlParams = new URLSearchParams(queryString);
+			
 			morse.updateWpm(urlParams.get('wpm'));
+			morse.updateChars(urlParams.get('chars'));
 		},
 		
 		addListeners : function() {
@@ -87,15 +87,31 @@ morse = {
 			$(document).on('click', '.key-btn', function() {
 				morse.keyButtonClicked($(this));
 			});
-			$(document).on('click', '#setup-button', function() {
-				morse.setupButtonClicked($(this));
+			$(document).on('click', '#pick-button', function() {
+				morse.pickButtonClicked();
 			}),
-			$(document).on('click', '#random-button', function() {
-				morse.randomButtonClicked($(this));
+			$(document).on('click', '#run-button', function() {
+				morse.runButtonClicked($(this));
 			});
 			$(document).on('click', '.alert .close', function(){
 				morse.hideAlert(100);
 			});
+			$(document).on('click', '#char-btn-all', function() {
+				morse.enableCharacters('all');
+			});
+			$(document).on('click', '#char-btn-none', function() {
+				morse.enableCharacters('none');
+			});
+			$(document).on('click', '#char-btn-letters', function() {
+				morse.enableCharacters('letters');
+			});
+			$(document).on('click', '#char-btn-numbers', function() {
+				morse.enableCharacters('numbers');
+			});
+			$(document).on('click', '#char-btn-vowels', function() {
+				morse.enableCharacters('vowels');
+			});
+			$(document).on('click', '#run-button, .filter-btn', morse.turnPickModeOff);
 		
 		},
 		
@@ -107,27 +123,72 @@ morse = {
 		},
 		
 		updateWpm : function(value) {
-			var wpm = 20;
+			var wpm = morse.wpm;
 			if(value != undefined && morse.hasOption('#wpm', value)) {
 				wpm = value;
 			}
 			$('#wpm').val(wpm).blur();
 		},
 		
+		updateChars : function(value) {
+			if(value != undefined) {
+				morse.enabledCharacters.splice(0, morse.enabledCharacters.length);
+				for(var i = 0; i < value.length; ++i) {
+					morse.enabledCharacters.push(value.charAt(i));
+				}
+			} else {
+				morse.enableCharacters('all');
+			}		
+			morse.updateKeysForEnabledCharacters();
+		},
+		
+		enableCharacters : function(type) {
+			morse.disableAllCharacters();
+			switch(type) {
+				case 'all':
+					for(var ch of morse.alphabet.keys()) {
+						morse.enabledCharacters.push(ch);
+					}
+					break;
+				case 'letters':
+					var chars = 'abcdefghijklmnopqrstuvwxyz';
+					for(var i = 0; i < chars.length; ++i) {
+						morse.enabledCharacters.push(chars.charAt(i));
+					}
+					break;
+				case 'numbers':
+					for(var i = 0; i < 10; ++i) {
+						morse.enabledCharacters.push(String(i));
+					}
+					break;
+				case 'vowels':
+					var chars = 'aeiou';
+					for(var i = 0; i < chars.length; ++i) {
+						morse.enabledCharacters.push(chars.charAt(i));
+					}
+					break;
+			}
+			morse.updateKeysForEnabledCharacters();
+		},
+		
+		disableAllCharacters : function() {
+			morse.enabledCharacters.splice(0, morse.enabledCharacters.length);
+		},
+		
 		keyButtonClicked : function(button) {
-			if(morse.setupMode) {
-				$(button).toggleClass('btn-info btn-outline-info');
+			if(morse.pickMode) {
+				$(button).toggleClass('btn-primary btn-outline-primary');
 			} else {
 				var value = $(button).html();
 				var morseCode = morse.plainToMorseCode(value);
 				if(morse.correctAnswer !== null) {
-					morse.enableRandomButton();
+					morse.enableRunButton();
 					var correct = value.toLowerCase() == morse.correctAnswer;
 					if(correct) {
 						morse.showSuccess('Correct!', 'The letter was ' + value, 250);
 						morse.play(morseCode);
 					} else {
-						morse.showError('Nope!', 'It was ' + morse.correctAnswer.toUpperCase(), 250);
+						morse.showError('Nope...', 'It was ' + morse.correctAnswer.toUpperCase(), 250);
 					}
 				} else {
 					morse.play(morseCode);
@@ -136,29 +197,38 @@ morse = {
 			}
 		},
 		
-		setupButtonClicked : function(button) {
-			morse.setupMode = $(button).html() === 'Setup';
-			$(button).html(morse.setupMode ? 'Done' : 'Setup');
-			if(morse.setupMode) {
-				morse.enableKeyButtons();
+		pickButtonClicked : function() {
+			if(morse.pickMode) {
+				morse.turnPickModeOff();
 			} else {
-				morse.disableKeyButtons();
-				morse.updateEnabledCharacters();
-			}
+				morse.turnPickModeOn();
+			}			
+		},
+		
+		turnPickModeOn : function() {
+			morse.pickMode = true;
+			$('#pick-button').html('Done');
+			morse.enableKeyButtons();
+		},
+		
+		turnPickModeOff : function() {
+			morse.pickMode = false;
+			$('#pick-button').html('Pick');
+			morse.disableKeyButtons();
+			morse.updateEnabledCharacters();
 		},
 		
 		updateEnabledCharacters : function() {
-			morse.enabledCharacters.splice(0, morse.enabledCharacters.length);
+			morse.disableAllCharacters();
 			$('.key-btn').not(':disabled').each(function(){
 				var value = $(this).html().toLowerCase();
 				morse.enabledCharacters.push(value);
 			});
-			console.log(morse.enabledCharacters);
 		},
 		
-		randomButtonClicked : function(button) {
+		runButtonClicked : function(button) {
 			morse.hideAlert(100);
-			morse.disableRandomButton();
+			morse.disableRunButton();
 			
 			var plainChar = morse.getRandomCharacter();
 			var morseChar = morse.plainToMorseCode(plainChar);
@@ -174,17 +244,17 @@ morse = {
 		},
 		
 		disableKeyButtons : function() {
-			$('.key-btn.btn-outline-info').prop('disabled', true);
+			$('.key-btn.btn-outline-primary').prop('disabled', true);
 		},
 		
-		enableRandomButton : function() {
-			$('#random-button').prop('disabled', false).find('.spinner-grow').remove();
+		enableRunButton : function() {
+			$('#run-button').prop('disabled', false).find('.spinner-grow').remove();
 		},
 		
-		disableRandomButton : function() {
+		disableRunButton : function() {
 			var spinner = $('<span></span>').addClass('spinner-grow spinner-grow-sm')
-				.css('margin-left', '6px').css('margin-bottom', '2px');
-			$('#random-button').prop('disabled', true).append(spinner);
+				.css('margin-left', '6px').css('margin-bottom', '5px');
+			$('#run-button').prop('disabled', true).append(spinner);
 		},
 		
 		getRandomCharacter : function() {
