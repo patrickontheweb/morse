@@ -29,3 +29,7 @@ button.key-btn {
 	text-align: right; 
 	width:4em; 
 }
+
+body {
+	background-color: pink;
+}
