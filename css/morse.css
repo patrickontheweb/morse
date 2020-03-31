@@ -1,0 +1,31 @@
+button.key-btn {
+	width: 2.5em;
+}
+
+.button-container button {
+	font-size: 0.75em;
+	height: 2.3em;
+}
+
+.control-container input,
+.control-container select,
+.control-container label {
+	font-size: 0.75em;
+	height: 2.2em;
+}
+
+.control-container label {
+	padding-left: 0.50em;
+	padding-right: 0.33em;
+}
+
+.control-container select {
+	padding: 0px;
+}
+
+.control-container input[type=number] {
+	direction: rtl;
+	padding-left: 0.1em;
+	text-align: right; 
+	width:4em; 
+}

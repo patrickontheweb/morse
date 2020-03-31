@@ -2,12 +2,15 @@ morse = {
 		validCharacters : /^[0-9a-zA-Z]+$/,
 		wordSeparator : '|',
 		letterSeparator : ' ',
+		charCount : 1,
+		wordCount : 1,
 		undefinedChar : '?',
 		frequency : 600,
 		wpm : 20,
 		enabledCharacters : ['p', 'c', 'm', '1', '8'],
 		pickMode : false,
 		correctAnswer : null,
+		currentAnswer : '',
 		playKeys : false,
 		alphabet : null,
 		
@@ -73,13 +76,16 @@ morse = {
 		updateUrlParameters : function() {
 			var queryString = window.location.search;
 			var urlParams = new URLSearchParams(queryString);
-			
+
 			morse.updateWpm(urlParams.get('wpm'));
+			morse.updateCharCount(urlParams.get('charCount'));
+			morse.updateWordCount(urlParams.get('wordCount'));
 			morse.updateChars(urlParams.get('chars'));
 		},
 		
 		addListeners : function() {
 			morse.addButtonListeners();
+			morse.addKeyListeners();
 			morse.addBlurListeners();
 		},
 		
@@ -112,14 +118,43 @@ morse = {
 				morse.enableCharacters('vowels');
 			});
 			$(document).on('click', '#run-button, .filter-btn', morse.turnPickModeOff);
+			$(document).on('click', '.filter-btn', morse.reset);
 		
+		},
+		
+		addKeyListeners : function() {
+			$(document).on('keypress', function(event){
+				var code = event.which;
+				if(code == 13) {
+					$('#run-button').click();
+				} else {
+					var char = String.fromCharCode(code).toUpperCase();
+					$('.key-btn:contains(' + char + ')').click();
+				}
+			});
+			$(document).on('keyup', function(event) {
+				if(event.which == 27) {
+					morse.reset();
+				}
+			});
 		},
 		
 		addBlurListeners : function() {
 			$(document).on('blur', '#wpm', function(){
 				morse.wpm = $(this).val();
 			});
-			
+			$(document).on('blur', '#char-count', function(){
+				morse.charCount = $(this).val();
+			});
+			$(document).on('blur', '#word-count', function(){
+				morse.wordCount = $(this).val();
+			});			
+		},
+		
+		reset : function() {
+			morse.turnPickModeOff();
+			morse.enableRunButton();
+			morse.correctAnswer = null;
 		},
 		
 		updateWpm : function(value) {
@@ -128,6 +163,22 @@ morse = {
 				wpm = value;
 			}
 			$('#wpm').val(wpm).blur();
+		},
+		
+		updateCharCount : function(value) {
+			var count = value;
+			if(isNaN(count) || count < 1 || count > 99) {
+				count = morse.charCount;	
+			}
+			$('#char-count').val(count).blur();
+		},
+		
+		updateWordCount : function(value) {
+			var count = value;
+			if(isNaN(count) === null || count < 1 || count > 99) {
+				count = morse.wordCount;	
+			}
+			$('#word-count').val(count).blur();
 		},
 		
 		updateChars : function(value) {
@@ -180,21 +231,34 @@ morse = {
 				$(button).toggleClass('btn-primary btn-outline-primary');
 			} else {
 				var value = $(button).html();
-				var morseCode = morse.plainToMorseCode(value);
-				if(morse.correctAnswer !== null) {
-					morse.enableRunButton();
-					var correct = value.toLowerCase() == morse.correctAnswer;
-					if(correct) {
-						morse.showSuccess('Correct!', 'The letter was ' + value, 250);
-						morse.play(morseCode);
-					} else {
-						morse.showError('Nope...', 'It was ' + morse.correctAnswer.toUpperCase(), 250);
-					}
+				if(morse.guessing()) {
+					morse.processAnswer(value);
 				} else {
-					morse.play(morseCode);
-				}
-				morse.correctAnswer = null;				
+					morse.play(morse.plainToMorseCode(value));
+				}			
 			}
+		},
+		
+		processAnswer : function(value) {
+			console.log('processAnswer');
+			morse.currentAnswer += value.toLowerCase();
+			console.log(morse.currentAnswer);
+			if(morse.correctAnswer.length == morse.currentAnswer.length) {
+				var correct = morse.correctAnswer === morse.currentAnswer;
+				if(correct) {
+					morse.showSuccess('Correct!', morse.correctAnswer.toUpperCase(), 250);
+					morse.play(morse.plainToMorseCode(morse.correctAnswer));
+				} else {
+					morse.showError('Nope...', 'The answer was ' + morse.correctAnswer.toUpperCase(), 250);
+				}
+				morse.currentAnswer = '';
+				morse.correctAnswer = null;
+				morse.enableRunButton();
+			}
+		},
+		
+		guessing : function() {
+			return morse.correctAnswer !== null;
 		},
 		
 		pickButtonClicked : function() {
@@ -230,13 +294,16 @@ morse = {
 			morse.hideAlert(100);
 			morse.disableRunButton();
 			
-			var plainChar = morse.getRandomCharacter();
-			var morseChar = morse.plainToMorseCode(plainChar);
+			var plainChars = '';
+			for(var i = 0; i < morse.charCount; ++i) {
+				plainChars += morse.getRandomCharacter();
+			}
+			var morseChars = morse.plainToMorseCode(plainChars);
 			
-			morse.correctAnswer = plainChar;
-			morse.play(morseChar);
+			morse.correctAnswer = plainChars;
+			morse.play(morseChars);
 			
-			console.log('Playing ' + morseChar + ' looking for ' + plainChar);
+			console.log('Playing ' + morseChars + ' looking for ' + plainChars);
 		},
 		
 		enableKeyButtons : function() {
