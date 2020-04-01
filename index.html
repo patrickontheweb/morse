@@ -43,9 +43,14 @@
 							<button type="button" id="char-btn-numbers" class="filter-btn btn btn-sm btn-outline-secondary mr-1">0-9</button>
 							<button type="button" id="char-btn-vowels" class="filter-btn btn btn-sm btn-outline-secondary mr-1">AEIOU</button>
 							<button type="button" id="pick-button" class="btn btn-sm btn-secondary">Pick</button>
-						</div>				
-						<div class="progress m1">
-						  	<div id="score-bar" class="progress-bar bg-success" style="width:100%">100%</div>
+						</div>	
+						<div class="d-flex justify-content-between">			
+							<div class="progress m1">
+							  	<div id="score-bar" class="progress-bar bg-success" style="width:1%"></div>
+							</div>
+							<div class="ml-1">
+								<span id="score-fraction" class="align-middle"></span>
+							</div>
 						</div>
 						<div class="d-flex justify-content-end control-container">
 							<div class="form-group form-inline m-0">
@@ -71,8 +76,8 @@
 							</div>
 						</div>
 					</div>
-					<div class="card plr-5">
-						<div class="card-body">
+					<div class="card">
+						<div class="card-body key-container">
 							<div class="text-center">
 								<button type="button" class="key-btn btn-lg btn btn-primary m-1">0</button>
 								<button type="button" class="key-btn btn-lg btn btn-primary m-1">1</button>
@@ -117,7 +122,7 @@
 								<button type="button" class="key-btn btn-lg btn btn-primary m-1">N</button>
 								<button type="button" class="key-btn btn-lg btn btn-primary mtbl-1 mr-5">M</button>
 							</div>
-							<div class="text-center mt-2">
+							<div class="text-center mt-4">
 								<button type="button" class="btn btn-secondary btn-lg" id="run-button">Run</button>
 							</div>
 						</div>

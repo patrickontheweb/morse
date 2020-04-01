@@ -8,6 +8,7 @@ morse = {
 		wrongAnswers : 0,
 		undefinedChar : '?',
 		frequency : 600,
+		alertDuration : 3000,
 		wpm : 20,
 		enabledCharacters : ['p', 'c', 'm', '1', '8'],
 		pickMode : false,
@@ -92,6 +93,7 @@ morse = {
 		},
 		
 		addButtonListeners : function() {
+			$(document).on('click', '#run-button, .filter-btn', morse.turnPickModeOff);
 			$(document).on('click', '.key-btn', function() {
 				morse.keyButtonClicked($(this));
 			});
@@ -119,7 +121,6 @@ morse = {
 			$(document).on('click', '#char-btn-vowels', function() {
 				morse.enableCharacters('vowels');
 			});
-			$(document).on('click', '#run-button, .filter-btn', morse.turnPickModeOff);
 			$(document).on('click', '.filter-btn', morse.reset);
 		
 		},
@@ -242,9 +243,7 @@ morse = {
 		},
 		
 		processAnswer : function(value) {
-			console.log('processAnswer');
 			morse.currentAnswer += value.toLowerCase();
-			console.log(morse.currentAnswer);
 			if(morse.correctAnswer.length == morse.currentAnswer.length) {
 				var correct = morse.correctAnswer === morse.currentAnswer;
 				if(correct) {
@@ -272,9 +271,11 @@ morse = {
 		},
 		
 		updateScore : function() {
-			var percent = 100 * morse.rightAnswers / (morse.rightAnswers + morse.wrongAnswers);
-			percent = percent.toFixed();
 			var colorClass;
+			var total = morse.rightAnswers + morse.wrongAnswers;
+			var percent = 100 * morse.rightAnswers / total;
+			percent = percent > 1 ? percent : 1;
+			
 			if(percent >= 75) {
 				colorClass = 'bg-success';
 			} else if(percent >= 25) {
@@ -282,7 +283,16 @@ morse = {
 			} else {
 				colorClass = 'bg-danger';
 			}
-			$('#score-bar').css('width', percent + '%').removeClass('bg-success bg-warning bg-danger').addClass(colorClass).html(percent + '%');
+			
+			$('.progress').css('opacity', 1);
+			
+			$('#score-bar')
+				.css('width', percent + '%')
+				.removeClass('bg-success bg-warning bg-danger')
+				.addClass(colorClass)
+				.html(percent.toFixed() + '%');
+			
+			$('#score-fraction').html(morse.rightAnswers + '/' + total);
 		},
 		
 		guessing : function() {
@@ -323,9 +333,11 @@ morse = {
 			morse.disableRunButton();
 			
 			var plainChars = '';
+			
 			for(var i = 0; i < morse.charCount; ++i) {
 				plainChars += morse.getRandomCharacter();
 			}
+			
 			var morseChars = morse.plainToMorseCode(plainChars);
 			
 			morse.correctAnswer = plainChars;
@@ -417,6 +429,9 @@ morse = {
 			 $(alert).find('.main').html(main);
 			 $(alert).find('.sub').html(sub);
 			 $(alert).animate({opacity:1}, speed);
+			 setTimeout(function() {
+				 morse.hideAlert(1000);
+			 }, morse.alertDuration);
 		},
 		
 		showError : function(main, sub, speed) {
@@ -424,6 +439,9 @@ morse = {
 			 $(alert).find('.main').html(main);
 			 $(alert).find('.sub').html(sub);
 			 $(alert).animate({opacity:1}, speed);
+			 setTimeout(function() {
+				 morse.hideAlert(1000);
+			 }, morse.alertDuration);
 		},
 		
 		hideAlert : function(speed) {

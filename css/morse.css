@@ -2,6 +2,13 @@ button.key-btn {
 	width: 2.5em;
 }
 
+div.key-container {
+	padding-bottom: 3rem;
+	padding-left: 5rem;
+	padding-right: 5rem;
+	padding-top: 2rem;
+}
+
 .button-container button {
 	font-size: 0.75em;
 	height: 2.4em;
@@ -32,5 +39,11 @@ button.key-btn {
 
 div.progress {
 	height: 2.5em;
+	opacity: 0;
 	width: 12em;
+}
+
+#score-fraction {
+	color: #AAAAAA;
+	font-size: 0.85em;
 }
