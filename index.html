@@ -23,13 +23,12 @@
 		<div class="container-fluid">
 		
 			<!-- page header -->
-			<h1 class="font-weight-bold text-primary text-center mt-4 mb-1">Morse CW Trainer</h1>	
+			<h1 class="font-weight-bold text-primary text-center mt-4 mb-1">Morse CW Trainer</h1>
 			
 			<!-- main body -->
 			<div class="d-flex justify-content-center">				
 				<!-- middle column -->
-				<div>
-				
+				<div>				
 					<!-- Alerts -->
 					<div class="alert mb-3 ptb-2 plr-3" style="opacity: 0;">
 					  <button type="button" class="close">&times;</button>
@@ -44,6 +43,9 @@
 							<button type="button" id="char-btn-numbers" class="filter-btn btn btn-sm btn-outline-secondary mr-1">0-9</button>
 							<button type="button" id="char-btn-vowels" class="filter-btn btn btn-sm btn-outline-secondary mr-1">AEIOU</button>
 							<button type="button" id="pick-button" class="btn btn-sm btn-secondary">Pick</button>
+						</div>				
+						<div class="progress m1">
+						  	<div id="score-bar" class="progress-bar bg-success" style="width:100%">100%</div>
 						</div>
 						<div class="d-flex justify-content-end control-container">
 							<div class="form-group form-inline m-0">
@@ -69,8 +71,8 @@
 							</div>
 						</div>
 					</div>
-					<div class="card pr-5 pl-5">
-						<div class="card-body">	
+					<div class="card plr-5">
+						<div class="card-body">
 							<div class="text-center">
 								<button type="button" class="key-btn btn-lg btn btn-primary m-1">0</button>
 								<button type="button" class="key-btn btn-lg btn btn-primary m-1">1</button>
@@ -115,7 +117,7 @@
 								<button type="button" class="key-btn btn-lg btn btn-primary m-1">N</button>
 								<button type="button" class="key-btn btn-lg btn btn-primary mtbl-1 mr-5">M</button>
 							</div>
-							<div class="text-center mt-4">
+							<div class="text-center mt-2">
 								<button type="button" class="btn btn-secondary btn-lg" id="run-button">Run</button>
 							</div>
 						</div>

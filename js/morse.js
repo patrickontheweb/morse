@@ -4,6 +4,8 @@ morse = {
 		letterSeparator : ' ',
 		charCount : 1,
 		wordCount : 1,
+		rightAnswers : 0,
+		wrongAnswers : 0,
 		undefinedChar : '?',
 		frequency : 600,
 		wpm : 20,
@@ -246,15 +248,41 @@ morse = {
 			if(morse.correctAnswer.length == morse.currentAnswer.length) {
 				var correct = morse.correctAnswer === morse.currentAnswer;
 				if(correct) {
+					morse.addRightAnswer();
 					morse.showSuccess('Correct!', morse.correctAnswer.toUpperCase(), 250);
 					morse.play(morse.plainToMorseCode(morse.correctAnswer));
 				} else {
+					morse.addWrongAnswer();
 					morse.showError('Nope...', 'The answer was ' + morse.correctAnswer.toUpperCase(), 250);
 				}
 				morse.currentAnswer = '';
 				morse.correctAnswer = null;
 				morse.enableRunButton();
 			}
+		},
+		
+		addRightAnswer : function() {
+			++morse.rightAnswers;
+			morse.updateScore();
+		},
+		
+		addWrongAnswer : function() {
+			++morse.wrongAnswers;
+			morse.updateScore();
+		},
+		
+		updateScore : function() {
+			var percent = 100 * morse.rightAnswers / (morse.rightAnswers + morse.wrongAnswers);
+			percent = percent.toFixed();
+			var colorClass;
+			if(percent >= 75) {
+				colorClass = 'bg-success';
+			} else if(percent >= 25) {
+				colorClass = 'bg-warning';
+			} else {
+				colorClass = 'bg-danger';
+			}
+			$('#score-bar').css('width', percent + '%').removeClass('bg-success bg-warning bg-danger').addClass(colorClass).html(percent + '%');
 		},
 		
 		guessing : function() {

@@ -4,7 +4,7 @@ button.key-btn {
 
 .button-container button {
 	font-size: 0.75em;
-	height: 2.3em;
+	height: 2.4em;
 }
 
 .control-container input,
@@ -28,4 +28,9 @@ button.key-btn {
 	padding-left: 0.1em;
 	text-align: right; 
 	width:4em; 
+}
+
+div.progress {
+	height: 2.5em;
+	width: 12em;
 }
